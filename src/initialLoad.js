@@ -130,90 +130,100 @@ export function loadInbox() {
 export function addTask() {
     const addTaskBtn = document.querySelector('#add-task-btn');
     addTaskBtn.addEventListener('click', e => {
-        
-        (function createModal() {
-            const newTaskViewport = document.createElement('div');
-            newTaskViewport.id = 'new-task-viewport';
-            content.appendChild(newTaskViewport);
-
-            const newTaskBackground = document.createElement('div');
-            newTaskBackground.id = 'new-task-background';
-            newTaskViewport.appendChild(newTaskBackground);
-
-            const newTaskModal = document.createElement('div');
-            newTaskModal.id = 'new-task-modal';
-            newTaskViewport.appendChild(newTaskModal);
-
-            const newTaskModalHeader = document.createElement('div');
-            newTaskModalHeader.id = 'new-task-modal-header';
-            newTaskModalHeader.innerText = 'Create New To Do'
-            newTaskModal.appendChild(newTaskModalHeader);
-
-            const newTaskForm = document.createElement('form');
-            newTaskForm.id = 'new-task-form';
-            newTaskModal.appendChild(newTaskForm);
-
-            const formElements = [
-                ['Title', 'new-task-title', 'new-task-title-input'],
-                ['Date', 'new-task-date', 'new-task-date-input'],
-                ['Notes', 'new-task-notes', 'new-task-notes-input'],
-                ['Priority', 'new-task-priority', 'new-task-priority-input'],
-            ]
-            const priorities = ['Low', 'Medium', 'High']
-
-            for (let i = 0; i < formElements.length; i++) {
-                const newTaskFormElement = document.createElement('div')
-                newTaskFormElement.classList.add('new-task-form-element');
-                newTaskFormElement.id = formElements[i][1];
-                newTaskForm.appendChild(newTaskFormElement);
-
-                const newTaskFormLabel = document.createElement('label');
-                newTaskFormLabel.htmlfor = formElements[i][2];
-                newTaskFormLabel.innerText = formElements[i][0];
-                newTaskFormElement.appendChild(newTaskFormLabel);
-
-                if (i === 0) {
-                    const newTaskFormInput = document.createElement('input');
-                    newTaskFormInput.id = formElements[i][2];
-                    newTaskFormElement.appendChild(newTaskFormInput);
-                } else if (i === 1) {
-                    const newTaskFormInput = document.createElement('input');
-                    newTaskFormInput.type = 'date';
-                    newTaskFormInput.id = formElements[i][2];
-                    newTaskFormElement.appendChild(newTaskFormInput);
-                } else if (i === 2) {
-                    const newTaskFormInput = document.createElement('textarea');
-                    newTaskFormInput.id = formElements[i][2];
-                    newTaskFormElement.appendChild(newTaskFormInput);
-                } else if (i === 3) {
-                    const newTaskFormInput = document.createElement('select');
-                    newTaskFormInput.id = formElements[i][2];
-                    newTaskFormElement.appendChild(newTaskFormInput);
-                    for (let j = 0; j < priorities.length; j++) {
-                        const newTaskFormOption = document.createElement('option');
-                        newTaskFormOption.value = priorities[0];
-                        newTaskFormOption.innerText = priorities[j];
-                        newTaskFormInput.appendChild(newTaskFormOption);
-                    };
-                };
-            };
-            
-            const modalBtns = document.createElement('div');
-            modalBtns.id = 'modal-btns';
-            newTaskForm.appendChild(modalBtns);
-
-            const cancelBtn = document.createElement('button');
-            cancelBtn.id = 'cancel-btn';
-            cancelBtn.innerText = 'Cancel';
-            cancelBtn.classList.add('new-task-btn');
-            modalBtns.appendChild(cancelBtn);
-
-            const saveBtn = document.createElement('button');
-            saveBtn.id = 'save-btn';
-            saveBtn.innerText = 'Save';
-            saveBtn.classList.add('new-task-btn');
-            modalBtns.appendChild(saveBtn);
-
-        })();
+        showNewTaskModal();
+        window.addEventListener('click', e => {
+            if (e.target.id === 'new-task-background' && document.querySelector('#new-task-viewport')) {
+                document.querySelector('#new-task-viewport').remove();
+            } else {
+                return;
+            }
+        });
     });
 };
+
+function showNewTaskModal() {
+    const newTaskViewport = document.createElement('div');
+    newTaskViewport.id = 'new-task-viewport';
+    content.appendChild(newTaskViewport);
+
+    const newTaskBackground = document.createElement('div');
+    newTaskBackground.id = 'new-task-background';
+    newTaskViewport.appendChild(newTaskBackground);
+
+    const newTaskModal = document.createElement('div');
+    newTaskModal.id = 'new-task-modal';
+    newTaskViewport.appendChild(newTaskModal);
+
+    const newTaskModalHeader = document.createElement('div');
+    newTaskModalHeader.id = 'new-task-modal-header';
+    newTaskModalHeader.innerText = 'Create New To Do'
+    newTaskModal.appendChild(newTaskModalHeader);
+
+    const newTaskForm = document.createElement('form');
+    newTaskForm.id = 'new-task-form';
+    newTaskModal.appendChild(newTaskForm);
+
+    const formElements = [
+        ['Title', 'new-task-title', 'new-task-title-input'],
+        ['Date', 'new-task-date', 'new-task-date-input'],
+        ['Notes', 'new-task-notes', 'new-task-notes-input'],
+        ['Priority', 'new-task-priority', 'new-task-priority-input'],
+    ]
+    const priorities = ['Low', 'Medium', 'High']
+
+    for (let i = 0; i < formElements.length; i++) {
+        const newTaskFormElement = document.createElement('div')
+        newTaskFormElement.classList.add('new-task-form-element');
+        newTaskFormElement.id = formElements[i][1];
+        newTaskForm.appendChild(newTaskFormElement);
+
+        const newTaskFormLabel = document.createElement('label');
+        newTaskFormLabel.htmlfor = formElements[i][2];
+        newTaskFormLabel.innerText = formElements[i][0];
+        newTaskFormElement.appendChild(newTaskFormLabel);
+
+        if (i === 0) {
+            const newTaskFormInput = document.createElement('input');
+            newTaskFormInput.required = true;
+            newTaskFormInput.id = formElements[i][2];
+            newTaskFormElement.appendChild(newTaskFormInput);
+        } else if (i === 1) {
+            const newTaskFormInput = document.createElement('input');
+            newTaskFormInput.type = 'date';
+            newTaskFormInput.id = formElements[i][2];
+            newTaskFormElement.appendChild(newTaskFormInput);
+        } else if (i === 2) {
+            const newTaskFormInput = document.createElement('textarea');
+            newTaskFormInput.id = formElements[i][2];
+            newTaskFormElement.appendChild(newTaskFormInput);
+        } else if (i === 3) {
+            const newTaskFormInput = document.createElement('select');
+            newTaskFormInput.id = formElements[i][2];
+            newTaskFormElement.appendChild(newTaskFormInput);
+            for (let j = 0; j < priorities.length; j++) {
+                const newTaskFormOption = document.createElement('option');
+                newTaskFormOption.value = priorities[0];
+                newTaskFormOption.innerText = priorities[j];
+                newTaskFormInput.appendChild(newTaskFormOption);
+            };
+        };
+    };
+    
+    const modalBtns = document.createElement('div');
+    modalBtns.id = 'modal-btns';
+    newTaskForm.appendChild(modalBtns);
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.id = 'cancel-btn';
+    cancelBtn.type = 'button';
+    cancelBtn.innerText = 'Cancel';
+    cancelBtn.classList.add('new-task-btn');
+    modalBtns.appendChild(cancelBtn);
+
+    const saveBtn = document.createElement('button');
+    saveBtn.id = 'save-btn';
+    saveBtn.type = 'button';
+    saveBtn.innerText = 'Save';
+    saveBtn.classList.add('new-task-btn');
+    modalBtns.appendChild(saveBtn);
+}
