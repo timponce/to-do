@@ -8,15 +8,12 @@ html, body {
     height: 100vh;
     min-height: 100vh;
     font-family: 'Poppins', sans-serif;
-    color: #050D42;
-    background-color: #FFFAEF;
+    color: #000000;
     font-weight: 500;
 }
 
 #content {
     height: 100%;
-    margin-left: 16px;
-    margin-right: 16px;
     display: grid;
     grid-template-rows: 50px 1fr 50px;
     grid-template-columns: 200px 1fr;
@@ -31,18 +28,36 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: #EEEEEE;
 }
 
 #header-left {
+    margin-left: 32px;
     display: flex;
+    align-items: center;
     font-weight: 600;
     font-size: 36px;
     column-gap: 12px;
 }
 
+#header-right {
+    margin-right: 32px;
+}
+
+#add-task-btn {
+    font-size: 36px;
+    border: none;
+    background-color: transparent;
+    color: #009D00;
+}
+
+#add-task-btn:hover {
+    cursor: pointer;
+}
+
 #sidebar {
     margin-top: 24px;
-    margin-left: 16px;
+    margin-left: 32px;
     display: flex;
     flex-direction: column;
     row-gap: 12px;
@@ -80,7 +95,164 @@ footer {
     align-items: center;
 }
 
+#footer-content {
+    margin-left: 32px;
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+
 .todo {
     display: flex;
     column-gap: 8px;
+}
+
+/* New Task Form */
+
+#new-task-viewport {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+#new-task-background {
+    z-index: 1;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    transition: opacity 1s;
+    opacity: 20%;
+}
+
+#new-task-modal {
+    z-index: 2;
+    height: 75vh;
+    width: 50vw;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow:   
+        0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+        0 6.7px 5.3px rgba(0, 0, 0, 0.048),
+        0 12.5px 10px rgba(0, 0, 0, 0.06),
+        0 22.3px 17.9px rgba(0, 0, 0, 0.072),
+        0 41.8px 33.4px rgba(0, 0, 0, 0.086),
+        0 100px 80px rgba(0, 0, 0, 0.12);
+        display: grid;
+        grid-template-rows: 48px 1fr;
+        grid-template-areas:
+            "header"
+            "form";
+}
+
+#new-task-modal-header {
+    grid-area: header;
+    line-height: 48px;
+    opacity: 100%;
+    font-size: 28px;
+    background-color: #EEEEEE;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    padding-left: 16px;
+}
+
+#new-task-form {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-columns: 3fr 2fr;
+    column-gap: 16px;
+    row-gap: 16px;
+    padding: 16px;
+    grid-template-areas:
+        "title date"
+        "notes priority"
+        "notes buttons";
+}
+
+.new-task-form-element {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+}
+
+.new-task-form-element label {
+    font-size: 24px;
+}
+
+.new-task-form-element input {
+    padding: 8px;
+    border: 1.5px solid #CCCCCC;
+    border-radius: 4px;
+    flex: 1 1 auto;
+    font-size: 18px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.new-task-form-element textarea {
+    padding: 4px;
+    border: 1.5px solid #CCCCCC;
+    border-radius: 4px;
+    flex: 1 1 auto;
+    resize: none;
+    font-size: 18px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.new-task-form-element select {
+    padding: 4px;
+    border: 1.5px solid #CCCCCC;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    font-size: 18px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#new-task-title {
+    grid-area: title;
+}
+
+#new-task-notes {
+    grid-area: notes;
+}
+
+#new-task-date {
+    grid-area: date;
+}
+
+#new-task-priority {
+    grid-area: priority;
+}
+
+#modal-btns {
+    grid-area: buttons;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: 
+        "cancel save";
+    column-gap: 16px;
+    margin-top: 42px;
+}
+
+#modal-btns button {
+    font-size: 18px;
+    font-family: Arial, Helvetica, sans-serif;
+    border: 1.5px solid #CCCCCC;
+    border-radius: 4px;
+
+}
+
+#cancel-btn {
+    grid-area: cancel;
+}
+
+#save-btn {
+    grid-area: save;
+    background-color: #009D00A1;
+}
+
+#save-btn:hover {
+    background-color: #009D00C7;
 }

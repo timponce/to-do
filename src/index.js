@@ -6,3 +6,4 @@ initial.loadFooter();
 initial.loadMain();
 initial.loadInbox();
 initial.sidebarController();
+initial.addTask();
