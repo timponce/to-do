@@ -78,13 +78,14 @@ export function loadFooter() {
 
     const footer = document.createElement('footer');
     
-    const footerContent = document.createElement('div');
+    const footerContent = document.createElement('a');
     footerContent.id = 'footer-content';
+    footerContent.href = 'https://github.com/timponce';
     footer.appendChild(footerContent);
 
     const footerText = document.createElement('span');
     footerText.id = 'footer-text';
-    footerText.innerText = 'Made by Tim Ponce';
+    footerText.innerText = 'By Tim Ponce';
     footerContent.appendChild(footerText);
 
     const footerIcon = document.createElement('i');
@@ -149,18 +150,29 @@ export function sidebarController() {
 
 };
 
+let tasks = [{title: 'Hover over the \'Check\' icon next to ToDo', notes: '', date: '', priority: 'Low', taskId: '1'} , {title: 'Click the icon to collapse the sidebar!', notes: '', date: '', priority: 'Low', taskId: '2'}];
+
 export function addTask() {
     const addTaskBtn = document.querySelector('#add-task-btn');
-    let tasks = [];
-    
+    loadInbox(tasks);
     addTaskBtn.addEventListener('click', e => {
         showNewTaskModal();
         window.addEventListener('click', e => {
-            
+
             const taskTitle = document.querySelector('#new-task-title-input');
             const taskNotes = document.querySelector('#new-task-notes-input');
             const taskDate = document.querySelector('#new-task-date-input');
             const taskPriority = document.querySelector('#new-task-priority-input');
+            let usedIds = ['1', '2'];
+            function randCharString() {
+                let randString = Math.random().toString(36).slice(2);
+                if (usedIds.includes(randString)) {
+                    randCharString();
+                } else {
+                    return randString;
+                }
+            }
+            const taskId = randCharString();
             
             if (e.target.id === 'new-task-background' || 
             e.target.id === 'cancel-btn' && 
@@ -168,7 +180,8 @@ export function addTask() {
                 document.querySelector('#new-task-viewport').remove();
             } else if (e.target.id === 'save-btn' && 
             document.querySelector('#new-task-viewport')) {
-                let task = createTask(taskTitle.value, taskNotes.value, taskDate.value, taskPriority.value);
+                let task = createTask(taskTitle.value, taskNotes.value, taskDate.value, taskPriority.value, taskId);
+                usedIds.push(taskId);
                 tasks.push(task);
                 loadInbox(tasks);
                 document.querySelector('#new-task-viewport').remove();
@@ -179,17 +192,18 @@ export function addTask() {
     });
 };
 
-function createTask(title, notes, date, priority) {
+function createTask(title, notes, date, priority, taskId) {
     return {
         title: title,
         notes: notes,
         date: date,
         priority: priority,
+        taskId: taskId,
     };
 };
 
 function loadInbox(tasks) {
-
+    
     if (document.querySelector('#inbox-list')) {
         document.querySelector('#inbox-list').remove();
     };
@@ -201,24 +215,65 @@ function loadInbox(tasks) {
     for (let i = 0; i < tasks.length; i++) {
         let Todo = document.createElement('li');
         Todo.classList.add('todo');
+        Todo.id = tasks[i].taskId;
         let checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         let taskTitle = document.createElement('span');
         taskTitle.innerText = tasks[i].title;
-        let taskNotes = document.createElement('span');
-        taskNotes.innerText = tasks[i].notes;
+        // let taskNotes = document.createElement('span');
+        // taskNotes.innerText = tasks[i].notes;
         let taskDate = document.createElement('span');
         taskDate.innerText = tasks[i].date;
-        let taskPriority = document.createElement('span');
-        taskPriority.innerText = tasks[i].priority;
+        let priorityIcon = document.createElement('i');
+        priorityIcon.classList.add('fas');
+        priorityIcon.classList.add('fa-flag');
+        priorityIcon.classList.add(tasks[i].priority);
+        let moveIcon = document.createElement('i');
+        moveIcon.classList.add('fas');
+        moveIcon.classList.add('fa-arrow-alt-circle-right');
+        let editIcon = document.createElement('i');
+        editIcon.classList.add('fas');
+        editIcon.classList.add('fa-edit');
+        let trashIcon = document.createElement('i');
+        trashIcon.classList.add('fas');
+        trashIcon.classList.add('fa-trash-alt');
         Todo.appendChild(checkbox);
         Todo.appendChild(taskTitle);
-        Todo.appendChild(taskNotes);
+        // Todo.appendChild(taskNotes);
         Todo.appendChild(taskDate);
-        Todo.appendChild(taskPriority);
+        Todo.appendChild(priorityIcon);
+        Todo.appendChild(moveIcon);
+        Todo.appendChild(editIcon);
+        Todo.appendChild(trashIcon);
         inboxList.appendChild(Todo);
-    }
 
+        Todo.addEventListener('click', e => {
+            console.log(e.target);
+            if (e.target.localName === 'span' || e.target.classList.contains('todo')) {
+                // expandTask();
+            } else if (e.target.type === 'checkbox') {
+                // completeTask();
+            } else if (e.target.classList.contains('fa-flag')) {
+                // promptChangePriority();
+            } else if (e.target.classList.contains('fa-arrow-alt-circle-right')) {
+                // promptAssignToProject();
+            } else if (e.target.classList.contains('fa-edit')) {
+                // editTask();
+            } else if (e.target.classList.contains('fa-trash-alt')) {
+                deleteTask(e);
+            }
+        });
+    };
+};
+
+function deleteTask(e) {
+    const todoId = e.target.parentNode.id;
+    for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].taskId == todoId) {
+            tasks.splice(i, 1);
+        };
+    };
+    loadInbox(tasks);
 };
 
 function showNewTaskModal() {
@@ -283,7 +338,7 @@ function showNewTaskModal() {
             newTaskFormElement.appendChild(newTaskFormInput);
             for (let j = 0; j < priorities.length; j++) {
                 const newTaskFormOption = document.createElement('option');
-                newTaskFormOption.value = priorities[0];
+                newTaskFormOption.value = priorities[j];
                 newTaskFormOption.innerText = priorities[j];
                 newTaskFormInput.appendChild(newTaskFormOption);
             };
