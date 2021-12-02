@@ -20,7 +20,7 @@ html, body {
     grid-template-areas:
         "header header"
         "sidebar main"
-        "footer footer"
+        "footer footer";
 }
 
 header {
@@ -37,7 +37,90 @@ header {
     align-items: center;
     font-weight: 600;
     font-size: 36px;
-    column-gap: 12px;
+    column-gap: 10px;
+}
+
+#title-icon-frame {
+    position: relative;
+    height: 36px;
+    width: 36px;
+}
+
+#title-icon {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+}
+
+#title-icon-line-1 {
+    position: absolute;
+    width: 20px;
+    height: 0px;
+    left: -1px;
+    top: 20px;
+    
+    background-color: #000000;
+    border: 4px solid #000000;
+    border-radius: 2px;
+    transform: rotate(-135deg);
+
+    transition: all 250ms ease-in-out;
+}
+
+#title-icon-line-2 {
+    position: absolute;
+    width: 32px;
+    height: 0px;
+    left: 6px;
+    top: 16px;
+
+    background-color: #000000;
+    border: 4px solid #000000;
+    border-radius: 2px;
+    transform: rotate(-45deg);
+
+    transition: all 250ms ease-in-out;
+}
+
+#title-icon-line-3 {
+    position: absolute;
+    width: 32px;
+    height: 0px;
+    left: 2px;
+    top: 28px;
+
+    background-color: #000000;
+    border: 4px solid #000000;
+    border-radius: 2px;
+
+    opacity: 100%;
+    transition: all 250ms ease-in-out;
+    animation-delay: 50ms;
+}
+
+#title-icon-line-1.end {
+    width: 32px;
+    height: 0px;
+    left: 2px;
+    top: 16px;
+
+    transform: rotate(-180deg);
+}
+
+#title-icon-line-2.end {
+    width: 32px;
+    height: 0px;
+    left: 2px;
+    top: 4px;
+
+    transform: rotate(0deg);
+}
+
+#title-icon-line-3.hidden {
+    opacity: 0%;
+    transition: all 200ms ease-in-out;
+
+    top: 39px;
 }
 
 #header-right {
@@ -56,12 +139,20 @@ header {
 }
 
 #sidebar {
+    grid-area: sidebar;
     margin-top: 24px;
     margin-left: 32px;
     display: flex;
     flex-direction: column;
     row-gap: 12px;
     font-size: 24px;
+
+    transition: all 350ms ease-in-out;
+}
+
+#sidebar.hidden {
+    transform: translateX(-200px);
+    transition: all 350ms ease-in-out;
 }
 
 ul {
@@ -87,6 +178,13 @@ ul {
 #main {
     grid-area: main;
     margin-top: 24px;
+
+    transition: all 350ms ease-in-out;
+}
+
+#main.sidebar-hidden {
+    transform: translateX(-168px);
+    transition: all 350ms ease-in-out;
 }
 
 footer {
@@ -130,8 +228,8 @@ footer {
 
 #new-task-modal {
     z-index: 2;
-    height: 75vh;
-    width: 50vw;
+    height: 70vh;
+    width: 60vw;
     background-color: white;
     border-radius: 16px;
     box-shadow:   
@@ -160,6 +258,7 @@ footer {
 }
 
 #new-task-form {
+    font-weight: 300;
     display: grid;
     grid-template-rows: 96px 1fr 1fr;
     grid-template-columns: 3fr 2fr;
@@ -256,4 +355,83 @@ footer {
 
 #save-btn:hover {
     background-color: #009D00C7;
+}
+
+/* Media queries */
+
+@media only screen and (max-width: 1200px) {
+    #new-task-modal {
+        width: 65vw;
+    }
+}
+
+@media only screen and (max-width: 1000px) {
+    #new-task-modal {
+        width: 70vw;
+    }
+}
+
+@media only screen and (max-width: 880px) {
+    #new-task-modal {
+        width: 75vw;
+    }
+}
+
+@media only screen and (max-width: 780px) {
+    #new-task-modal {
+        width: 90vw;
+    }
+}
+
+@media only screen and (max-width: 660px) {
+    #new-task-modal {
+        height: 85vh;
+    }
+
+    #new-task-form {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 96px 1fr 96px 96px 48px;
+        row-gap: 8px;
+        grid-template-areas:
+            "title"
+            "notes"
+            "date"
+            "priority"
+            "buttons";
+    }
+}
+
+@media only screen and (max-width: 660px) and (max-height: 650px) {
+    #new-task-form {
+        row-gap: 0;
+    }
+}
+
+@media only screen and (max-height: 520px) {
+    #new-task-modal {
+        height: 85vh;
+    }
+}
+
+@media only screen and (max-height: 420px) {
+    #new-task-modal {
+        width: 80vw;
+    }
+
+    #new-task-form {
+        row-gap: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 96px 1fr;
+        grid-template-areas:
+            "title date priority"
+            "notes notes buttons";
+    }
+}
+
+@media only screen and (max-height: 340px) {
+    #new-task-modal {
+        height: 290px;
+    }
 }
