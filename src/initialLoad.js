@@ -69,6 +69,7 @@ export function loadSidebar() {
         newElement.id = sidebarArray[i][1];
         newElement.innerText = sidebarArray[i][0];
         sidebar.appendChild(newElement);
+        i === 0 ? newElement.classList.add('sidebar-selected') : '';
     };
 
     content.appendChild(sidebar);
@@ -151,6 +152,7 @@ export function sidebarController() {
 };
 
 let tasks = [{title: 'Hover over the \'Check\' icon next to ToDo', notes: '', date: '', priority: 'Low', taskId: '1'} , {title: 'Click the icon to collapse the sidebar!', notes: '', date: '', priority: 'Low', taskId: '2'}];
+let compltetedTasks = [];
 
 export function addTask() {
     const addTaskBtn = document.querySelector('#add-task-btn');
@@ -203,7 +205,7 @@ function createTask(title, notes, date, priority, taskId) {
 };
 
 function loadInbox(tasks) {
-    
+
     if (document.querySelector('#inbox-list')) {
         document.querySelector('#inbox-list').remove();
     };
@@ -250,15 +252,15 @@ function loadInbox(tasks) {
         Todo.addEventListener('click', e => {
             console.log(e.target);
             if (e.target.localName === 'span' || e.target.classList.contains('todo')) {
-                // expandTask();
+                // expandTask(e);
             } else if (e.target.type === 'checkbox') {
-                // completeTask();
+                completeTask(e);
             } else if (e.target.classList.contains('fa-flag')) {
-                // promptChangePriority();
+                // promptChangePriority(e);
             } else if (e.target.classList.contains('fa-arrow-alt-circle-right')) {
-                // promptAssignToProject();
+                // promptAssignToProject(e);
             } else if (e.target.classList.contains('fa-edit')) {
-                // editTask();
+                // editTask(e);
             } else if (e.target.classList.contains('fa-trash-alt')) {
                 deleteTask(e);
             }
@@ -266,10 +268,22 @@ function loadInbox(tasks) {
     };
 };
 
+function completeTask(e) {
+    e.target.parentNode.classList.toggle('completed');
+    const todoId = e.target.parentNode.id;
+    for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].tasksId === todoId) {
+            let completedTask = tasks.splice(i, 1);
+            compltetedTasks.push(completedTask[0]);
+        };
+    };
+    // loadInbox(tasks);
+};
+
 function deleteTask(e) {
     const todoId = e.target.parentNode.id;
     for (let i = 0; i < tasks.length; i++) {
-        if (tasks[i].taskId == todoId) {
+        if (tasks[i].taskId === todoId) {
             tasks.splice(i, 1);
         };
     };

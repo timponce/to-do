@@ -221,6 +221,10 @@ a {
     margin-bottom: 12px;
 }
 
+.todo.completed {
+    opacity: 50%;
+}
+
 .fas {
     cursor: pointer;
 }
