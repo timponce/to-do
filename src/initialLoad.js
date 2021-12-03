@@ -165,7 +165,7 @@ export function addTask() {
             const taskNotes = document.querySelector('#new-task-notes-input');
             const taskDate = document.querySelector('#new-task-date-input');
             const taskPriority = document.querySelector('#new-task-priority-input');
-            let usedIds = ['1', '2'];
+            let usedIds = [];
             function randCharString() {
                 let randString = Math.random().toString(36).slice(2);
                 if (usedIds.includes(randString)) {
@@ -250,7 +250,6 @@ function loadInbox(tasks) {
         inboxList.appendChild(Todo);
 
         Todo.addEventListener('click', e => {
-            console.log(e.target);
             if (e.target.localName === 'span' || e.target.classList.contains('todo')) {
                 // expandTask(e);
             } else if (e.target.type === 'checkbox') {

@@ -29,6 +29,7 @@ header {
     justify-content: space-between;
     align-items: center;
     background-color: #EEEEEE;
+    z-index: 1;
 }
 
 #header-left {
@@ -209,6 +210,8 @@ a {
     text-decoration: none;
     color: black;
 }
+
+/* Todos */
 
 .todo {
     display: grid;
@@ -432,6 +435,50 @@ a {
 }
 
 @media only screen and (max-width: 660px) {
+    #content {
+        display: grid;
+        grid-template-rows: 50px 288px 1fr 50px;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "header"
+            "sidebar"
+            "main"
+            "footer";
+    }
+
+    #sidebar {
+        row-gap: 8px;
+        margin-top: 0px;
+        margin-left: 0px;
+        row-gap: 0px;
+    }
+
+    .sidebar-element {
+        border-bottom: 2px solid #EEEEEE;
+        width: 100%;
+        text-align: center;
+        padding: 4px 0;
+    }
+
+    .sidebar-element:hover {
+        border-radius: 0;
+    }
+
+    #sidebar.hidden {
+        transform: translateX(0px);
+        transform: translateY(-288px);
+    }
+
+    .sidebar-selected {
+        border-radius: 0;
+    }
+
+    #main.sidebar-hidden {
+        transform: translateX(0px);
+        transform: translateY(-288px);
+        margin-right: 40px;
+    }
+
     #new-task-modal {
         height: 85vh;
     }
