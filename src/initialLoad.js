@@ -1,5 +1,8 @@
 const content = document.getElementById('content');
 
+let tasks = [{title: 'Hover over the \'Check\' icon next to ToDo', notes: '', date: '', priority: 'Low', taskKey: '1'} , {title: 'Click the icon to collapse the sidebar!', notes: '', date: '', priority: 'Low', taskKey: '2'}];
+let compltetedTasks = [];
+
 export function loadHeader() {
 
     const header = document.createElement('header');
@@ -47,6 +50,11 @@ export function loadHeader() {
     addTaskIcon.classList.add('fas');
     addTaskIcon.classList.add('fa-plus-square');
     addTaskBtn.appendChild(addTaskIcon);
+
+    addTaskBtn.addEventListener('click', e => {
+        showTaskModal(e);
+        addTask();
+    });
 };
 
 export function loadSidebar() {
@@ -102,6 +110,7 @@ export function loadMain() {
     const main = document.createElement('div');
     main.id = 'main';
     content.insertBefore(main, document.querySelector('footer'));
+    loadInbox(tasks);
 };
 
 export function headerController() {
@@ -151,56 +160,56 @@ export function sidebarController() {
 
 };
 
-let tasks = [{title: 'Hover over the \'Check\' icon next to ToDo', notes: '', date: '', priority: 'Low', taskId: '1'} , {title: 'Click the icon to collapse the sidebar!', notes: '', date: '', priority: 'Low', taskId: '2'}];
-let compltetedTasks = [];
-
 export function addTask() {
-    const addTaskBtn = document.querySelector('#add-task-btn');
-    loadInbox(tasks);
-    addTaskBtn.addEventListener('click', e => {
-        showNewTaskModal();
-        window.addEventListener('click', e => {
+    window.addEventListener('click', e => {
 
-            const taskTitle = document.querySelector('#new-task-title-input');
-            const taskNotes = document.querySelector('#new-task-notes-input');
-            const taskDate = document.querySelector('#new-task-date-input');
-            const taskPriority = document.querySelector('#new-task-priority-input');
-            let usedIds = [];
-            function randCharString() {
-                let randString = Math.random().toString(36).slice(2);
-                if (usedIds.includes(randString)) {
-                    randCharString();
-                } else {
-                    return randString;
+        const taskTitle = document.querySelector('#new-task-title-input');
+        const taskNotes = document.querySelector('#new-task-notes-input');
+        const taskDate = document.querySelector('#new-task-date-input');
+        const taskPriority = document.querySelector('#new-task-priority-input');
+        let usedKeys = [];
+        function randCharString() {
+            let randString = Math.random().toString(36).slice(2);
+            if (usedKeys.includes(randString)) {
+                randCharString();
+            } else {
+                return randString;
+            }
+        }
+        const taskKey = randCharString();
+        
+        if ((e.target.id === 'new-task-background' || 
+        e.target.id === 'cancel-btn') && 
+        (document.querySelector('#new-task-viewport'))) {
+            document.querySelector('#new-task-viewport').remove();
+        } else if (e.target.id === 'save-btn' && 
+        document.querySelector('#new-task-viewport')) {
+            let task = createTask(taskTitle.value, taskNotes.value, taskDate.value, taskPriority.value, taskKey);
+            usedKeys.push(taskKey);
+            const modalHeader = document.querySelector('#new-task-modal-header');
+            if (modalHeader) {
+                if (modalHeader.innerText.includes('Create')) {
+                    tasks.push(task);
+                } else if (modalHeader.innerText.includes('Edit')) {
+                    let taskIndex = getTaskIndexViaTodoElement.taskIndex;
+                    tasks.splice(taskIndex, 1, task)
                 }
             }
-            const taskId = randCharString();
-            
-            if (e.target.id === 'new-task-background' || 
-            e.target.id === 'cancel-btn' && 
-            document.querySelector('#new-task-viewport')) {
-                document.querySelector('#new-task-viewport').remove();
-            } else if (e.target.id === 'save-btn' && 
-            document.querySelector('#new-task-viewport')) {
-                let task = createTask(taskTitle.value, taskNotes.value, taskDate.value, taskPriority.value, taskId);
-                usedIds.push(taskId);
-                tasks.push(task);
-                loadInbox(tasks);
-                document.querySelector('#new-task-viewport').remove();
-            } else {
-                return;
-            }
-        });
+            loadInbox(tasks);
+            document.querySelector('#new-task-viewport').remove();
+        } else {
+            return;
+        }
     });
 };
 
-function createTask(title, notes, date, priority, taskId) {
+function createTask(title, notes, date, priority, taskKey) {
     return {
         title: title,
         notes: notes,
         date: date,
         priority: priority,
-        taskId: taskId,
+        taskKey: taskKey,
     };
 };
 
@@ -217,9 +226,10 @@ function loadInbox(tasks) {
     for (let i = 0; i < tasks.length; i++) {
         let Todo = document.createElement('li');
         Todo.classList.add('todo');
-        Todo.id = tasks[i].taskId;
+        Todo.dataset.key = tasks[i].taskKey;
         let checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
+        checkbox.classList.add('checkbox');
         let taskTitle = document.createElement('span');
         taskTitle.innerText = tasks[i].title;
         // let taskNotes = document.createElement('span');
@@ -259,7 +269,7 @@ function loadInbox(tasks) {
             } else if (e.target.classList.contains('fa-arrow-alt-circle-right')) {
                 // promptAssignToProject(e);
             } else if (e.target.classList.contains('fa-edit')) {
-                // editTask(e);
+                showTaskModal(e);
             } else if (e.target.classList.contains('fa-trash-alt')) {
                 deleteTask(e);
             }
@@ -289,7 +299,10 @@ function deleteTask(e) {
     loadInbox(tasks);
 };
 
-function showNewTaskModal() {
+function showTaskModal(e) {
+    getTaskIndexViaTodoElement(e);
+    let taskIndex = getTaskIndexViaTodoElement.taskIndex;
+
     const newTaskViewport = document.createElement('div');
     newTaskViewport.id = 'new-task-viewport';
     content.appendChild(newTaskViewport);
@@ -304,7 +317,11 @@ function showNewTaskModal() {
 
     const newTaskModalHeader = document.createElement('div');
     newTaskModalHeader.id = 'new-task-modal-header';
-    newTaskModalHeader.innerText = 'Create New To Do'
+    if (e.target.classList.contains('fa-plus-square')) {
+        newTaskModalHeader.innerText = 'Create New To Do';
+    } else if (e.target.classList.contains('fa-edit')) {
+        newTaskModalHeader.innerText = 'Edit To Do';
+    }
     newTaskModal.appendChild(newTaskModalHeader);
 
     const newTaskForm = document.createElement('form');
@@ -332,17 +349,26 @@ function showNewTaskModal() {
 
         if (i === 0) {
             const newTaskFormInput = document.createElement('input');
+            if (taskIndex) {
+                newTaskFormInput.value = tasks[taskIndex].title;
+            }
             newTaskFormInput.required = true;
             newTaskFormInput.maxLength = '40';
             newTaskFormInput.id = formElements[i][2];
             newTaskFormElement.appendChild(newTaskFormInput);
         } else if (i === 1) {
             const newTaskFormInput = document.createElement('input');
+            if (taskIndex) {
+                newTaskFormInput.value = tasks[taskIndex].date;
+            }
             newTaskFormInput.type = 'date';
             newTaskFormInput.id = formElements[i][2];
             newTaskFormElement.appendChild(newTaskFormInput);
         } else if (i === 2) {
             const newTaskFormInput = document.createElement('textarea');
+            if (taskIndex) {
+                newTaskFormInput.value = tasks[taskIndex].notes;
+            }
             newTaskFormInput.id = formElements[i][2];
             newTaskFormElement.appendChild(newTaskFormInput);
         } else if (i === 3) {
@@ -352,6 +378,11 @@ function showNewTaskModal() {
             for (let j = 0; j < priorities.length; j++) {
                 const newTaskFormOption = document.createElement('option');
                 newTaskFormOption.value = priorities[j];
+                if (taskIndex) {
+                    if (tasks[taskIndex].priority === priorities[j]) {
+                        newTaskFormOption.selected = 'selected';
+                    }
+                }
                 newTaskFormOption.innerText = priorities[j];
                 newTaskFormInput.appendChild(newTaskFormOption);
             };
@@ -375,4 +406,15 @@ function showNewTaskModal() {
     saveBtn.innerText = 'Save';
     saveBtn.classList.add('new-task-btn');
     modalBtns.appendChild(saveBtn);
+};
+
+function getTaskIndexViaTodoElement(e) {
+    let thisTaskKey = e.target.parentElement.dataset.key;
+    let taskIndex;
+    for (let x in tasks) {
+        if (tasks[x].taskKey == thisTaskKey) {
+            taskIndex = x;
+        };
+    };
+    getTaskIndexViaTodoElement.taskIndex = taskIndex; 
 };

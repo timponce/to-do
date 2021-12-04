@@ -51,6 +51,7 @@ header {
     position: absolute;
     width: 36px;
     height: 36px;
+    cursor: pointer;
 }
 
 #title-icon-line-1 {
@@ -164,6 +165,7 @@ ul {
 .sidebar-element {
     width: fit-content;
     padding: 0 4px;
+    cursor: pointer;
 }
 
 .sidebar-selected {
@@ -174,7 +176,6 @@ ul {
 .sidebar-element:hover {
     background-color: #DDDDDD;
     border-radius: 6px;
-    cursor: default;
 }
 
 #main {
@@ -222,10 +223,17 @@ a {
     column-gap: 8px;
     align-items: center;
     margin-bottom: 12px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid #EEE;
 }
 
 .todo.completed {
     opacity: 50%;
+    border-bottom: 2px solid #DDD;
+}
+
+.checkbox {
+    cursor: pointer;
 }
 
 .fas {
@@ -393,6 +401,7 @@ a {
     border: 1.5px solid #CCCCCC;
     border-radius: 4px;
     height: 48px;
+    cursor: pointer;
 }
 
 #cancel-btn {
