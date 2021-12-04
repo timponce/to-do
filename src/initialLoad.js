@@ -290,9 +290,9 @@ function completeTask(e) {
 };
 
 function deleteTask(e) {
-    const todoId = e.target.parentNode.id;
+    const todoKey = e.target.parentNode.dataset.key;
     for (let i = 0; i < tasks.length; i++) {
-        if (tasks[i].taskId === todoId) {
+        if (tasks[i].taskKey === todoKey) {
             tasks.splice(i, 1);
         };
     };
