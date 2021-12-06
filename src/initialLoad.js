@@ -1,7 +1,7 @@
 const content = document.getElementById('content');
 
-let tasks = [{title: 'Hover over the \'Check\' icon next to ToDo', notes: '', date: '', priority: 'Low', taskKey: '1'} , {title: 'Click the icon to collapse the sidebar!', notes: '', date: '', priority: 'Low', taskKey: '2'}];
-let compltetedTasks = [];
+let tasks = [{title: 'Hover over the \'Check\' icon next to ToDo', notes: '', date: '', priority: 'Low', status: 'incomplete', taskKey: '1'} , {title: 'Click the icon to collapse the sidebar!', notes: '', date: '', priority: 'Low', status: 'incomplete', taskKey: '2'}];
+let completedTasks = [];
 
 export function loadHeader() {
 
@@ -144,10 +144,32 @@ export function sidebarController() {
         };
     };
 
+    function addSidebarHighlight(e) {
+        e ? e.target.classList.add('sidebar-selected') : document.querySelector('#inbox').classList.add('sidebar-selected');
+    }
+
     sidebar.addEventListener('click', e => {
         if (e.target.localName === 'li') {
+            switch (e.target.id) {
+                case 'inbox':
+                    loadInbox(tasks);
+                    break;
+                case 'today':
+                    break;
+                case 'this-week':
+                    break;
+                case 'calendar':
+                    break;
+                case 'projects':
+                    break;
+                case 'archive':
+                    loadInbox(completedTasks);
+                    break;
+                default:
+                    alert('Something went wrong')
+            };
             removeSidebarHighlight();
-            e.target.classList.add('sidebar-selected');
+            addSidebarHighlight(e);
         };
     });
 
@@ -156,6 +178,8 @@ export function sidebarController() {
         main.classList.toggle('sidebar-hidden');
     };
 
+    sidebarController.removeSidebarHighlight = removeSidebarHighlight;
+    sidebarController.addSidebarHighlight = addSidebarHighlight;
     sidebarController.hideSidebar = hideSidebar;
 
 };
@@ -177,6 +201,7 @@ export function addTask() {
             }
         }
         const taskKey = randCharString();
+        const status = 'incomplete';
         
         if ((e.target.id === 'new-task-background' || 
         e.target.id === 'cancel-btn') && 
@@ -184,7 +209,7 @@ export function addTask() {
             document.querySelector('#new-task-viewport').remove();
         } else if (e.target.id === 'save-btn' && 
         document.querySelector('#new-task-viewport')) {
-            let task = createTask(taskTitle.value, taskNotes.value, taskDate.value, taskPriority.value, taskKey);
+            let task = createTask(taskTitle.value, taskNotes.value, taskDate.value, taskPriority.value, status, taskKey);
             usedKeys.push(taskKey);
             const modalHeader = document.querySelector('#new-task-modal-header');
             if (modalHeader) {
@@ -196,6 +221,8 @@ export function addTask() {
                 }
             }
             loadInbox(tasks);
+            sidebarController.removeSidebarHighlight();
+            sidebarController.addSidebarHighlight();
             document.querySelector('#new-task-viewport').remove();
         } else {
             return;
@@ -203,17 +230,18 @@ export function addTask() {
     });
 };
 
-function createTask(title, notes, date, priority, taskKey) {
+function createTask(title, notes, date, priority, status, taskKey) {
     return {
         title: title,
         notes: notes,
         date: date,
         priority: priority,
+        status: status,
         taskKey: taskKey,
     };
 };
 
-function loadInbox(tasks) {
+function loadInbox(array) {
 
     if (document.querySelector('#inbox-list')) {
         document.querySelector('#inbox-list').remove();
@@ -223,23 +251,23 @@ function loadInbox(tasks) {
     inboxList.id = 'inbox-list';
     main.appendChild(inboxList);
 
-    for (let i = 0; i < tasks.length; i++) {
+    for (let i = 0; i < array.length; i++) {
         let Todo = document.createElement('li');
         Todo.classList.add('todo');
-        Todo.dataset.key = tasks[i].taskKey;
+        Todo.classList.add(array[i].status);
+        Todo.dataset.key = array[i].taskKey;
         let checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.classList.add('checkbox');
+        array[i].status === 'complete' ? checkbox.checked = true : checkbox.checked = false;
         let taskTitle = document.createElement('span');
-        taskTitle.innerText = tasks[i].title;
-        // let taskNotes = document.createElement('span');
-        // taskNotes.innerText = tasks[i].notes;
+        taskTitle.innerText = array[i].title;
         let taskDate = document.createElement('span');
-        taskDate.innerText = tasks[i].date;
+        taskDate.innerText = array[i].date;
         let priorityIcon = document.createElement('i');
         priorityIcon.classList.add('fas');
         priorityIcon.classList.add('fa-flag');
-        priorityIcon.classList.add(tasks[i].priority);
+        priorityIcon.classList.add(array[i].priority);
         let moveIcon = document.createElement('i');
         moveIcon.classList.add('fas');
         moveIcon.classList.add('fa-arrow-alt-circle-right');
@@ -251,7 +279,6 @@ function loadInbox(tasks) {
         trashIcon.classList.add('fa-trash-alt');
         Todo.appendChild(checkbox);
         Todo.appendChild(taskTitle);
-        // Todo.appendChild(taskNotes);
         Todo.appendChild(taskDate);
         Todo.appendChild(priorityIcon);
         Todo.appendChild(moveIcon);
@@ -278,16 +305,30 @@ function loadInbox(tasks) {
 };
 
 function completeTask(e) {
-    e.target.parentNode.classList.toggle('completed');
-    const todoId = e.target.parentNode.id;
-    for (let i = 0; i < tasks.length; i++) {
-        if (tasks[i].tasksId === todoId) {
-            let completedTask = tasks.splice(i, 1);
-            compltetedTasks.push(completedTask[0]);
+    const todoKey = e.target.parentNode.dataset.key;
+    markComplete(e);
+    if (e.target.checked === true) {
+        for (let i = 0; i < tasks.length; i++) {
+            if (tasks[i].taskKey === todoKey) {
+                tasks[i].status = 'complete';
+                let completedTask = tasks.splice(i, 1);
+                completedTasks.push(completedTask[0]);
+            };
+        };
+    } else if (e.target.checked === false) {
+        for (let i = 0; i < completedTasks.length; i++) {
+            if (completedTasks[i].taskKey === todoKey) {
+                completedTasks[i].status = 'incomplete';
+                let uncompletedTask = completedTasks.splice(i, 1);
+                tasks.push(uncompletedTask[0]);
+            };
         };
     };
-    // loadInbox(tasks);
 };
+
+function markComplete(e) {
+    e.target.parentNode.classList.toggle('complete');
+}
 
 function deleteTask(e) {
     const todoKey = e.target.parentNode.dataset.key;
