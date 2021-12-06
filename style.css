@@ -227,7 +227,7 @@ a {
     border-bottom: 2px solid #EEE;
 }
 
-.todo.completed {
+.todo.complete {
     opacity: 50%;
     border-bottom: 2px solid #DDD;
 }
