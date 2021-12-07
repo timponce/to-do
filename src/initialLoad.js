@@ -1,7 +1,11 @@
+const { format, parseISO, isToday, isThisWeek } = require('date-fns');
+
 const content = document.getElementById('content');
 
 let tasks = [{title: 'Hover over the \'Check\' icon next to ToDo', notes: '', date: '', priority: 'Low', status: 'incomplete', taskKey: '1'} , {title: 'Click the icon to collapse the sidebar!', notes: '', date: '', priority: 'Low', status: 'incomplete', taskKey: '2'}];
 let completedTasks = [];
+let todaysTasks = [];
+let thisWeeksTasks = [];
 
 export function loadHeader() {
 
@@ -155,8 +159,12 @@ export function sidebarController() {
                     loadInbox(tasks);
                     break;
                 case 'today':
+                    getTodaysTasks();
+                    loadInbox(todaysTasks);
                     break;
                 case 'this-week':
+                    getThisWeeksTasks();
+                    loadInbox(thisWeeksTasks);
                     break;
                 case 'calendar':
                     break;
@@ -263,7 +271,15 @@ function loadInbox(array) {
         let taskTitle = document.createElement('span');
         taskTitle.innerText = array[i].title;
         let taskDate = document.createElement('span');
-        taskDate.innerText = array[i].date;
+        taskDate.classList.add('todo-date');
+        if (array[i].date != '') {
+            console.log(array[i].date);
+            let date = parseISO(array[i].date);
+            console.log(date);
+            let formattedDate = format(new Date(array[i].date), 'MMM d, yy');
+            console.log(formattedDate);
+            taskDate.innerText = formattedDate;
+        };
         let priorityIcon = document.createElement('i');
         priorityIcon.classList.add('fas');
         priorityIcon.classList.add('fa-flag');
@@ -292,6 +308,7 @@ function loadInbox(array) {
             } else if (e.target.type === 'checkbox') {
                 completeTask(e);
             } else if (e.target.classList.contains('fa-flag')) {
+                console.log(tasks);
                 // promptChangePriority(e);
             } else if (e.target.classList.contains('fa-arrow-alt-circle-right')) {
                 // promptAssignToProject(e);
@@ -447,6 +464,26 @@ function showTaskModal(e) {
     saveBtn.innerText = 'Save';
     saveBtn.classList.add('new-task-btn');
     modalBtns.appendChild(saveBtn);
+};
+
+function getTodaysTasks() {
+    todaysTasks = [];
+    for (let i = 0; i < tasks.length; i++) {
+        let date = parseISO(tasks[i].date);
+        if (isToday(date)) {
+            todaysTasks.push(tasks[i]);
+        };
+    };
+};
+
+function getThisWeeksTasks() {
+    thisWeeksTasks = [];
+    for (let i = 0; i < tasks.length; i++) {
+        let date = parseISO(tasks[i].date);
+        if (isThisWeek(date)) {
+            thisWeeksTasks.push(tasks[i]);
+        };
+    };
 };
 
 function getTaskIndexViaTodoElement(e) {
