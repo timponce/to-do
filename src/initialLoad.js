@@ -154,28 +154,7 @@ export function sidebarController() {
 
     sidebar.addEventListener('click', e => {
         if (e.target.localName === 'li') {
-            switch (e.target.id) {
-                case 'inbox':
-                    loadInbox(tasks);
-                    break;
-                case 'today':
-                    getTodaysTasks();
-                    loadInbox(todaysTasks);
-                    break;
-                case 'this-week':
-                    getThisWeeksTasks();
-                    loadInbox(thisWeeksTasks);
-                    break;
-                case 'calendar':
-                    break;
-                case 'projects':
-                    break;
-                case 'archive':
-                    loadInbox(completedTasks);
-                    break;
-                default:
-                    alert('Something went wrong')
-            };
+            loadPage(e.target.id);
             removeSidebarHighlight();
             addSidebarHighlight(e);
         };
@@ -191,6 +170,31 @@ export function sidebarController() {
     sidebarController.hideSidebar = hideSidebar;
 
 };
+
+function loadPage(e) {
+    switch (e) {
+        case 'inbox':
+            loadInbox(tasks);
+            break;
+        case 'today':
+            getTodaysTasks();
+            loadInbox(todaysTasks);
+            break;
+        case 'this-week':
+            getThisWeeksTasks();
+            loadInbox(thisWeeksTasks);
+            break;
+        case 'calendar':
+            break;
+        case 'projects':
+            break;
+        case 'archive':
+            loadInbox(completedTasks);
+            break;
+        default:
+            alert('Something went wrong')
+    };
+}
 
 export function addTask() {
     window.addEventListener('click', e => {
@@ -348,13 +352,29 @@ function markComplete(e) {
 }
 
 function deleteTask(e) {
+    const sidebar = document.querySelector('#sidebar');
     const todoKey = e.target.parentNode.dataset.key;
-    for (let i = 0; i < tasks.length; i++) {
-        if (tasks[i].taskKey === todoKey) {
-            tasks.splice(i, 1);
+    if (e.target.parentNode.classList.contains('complete')) {
+        for (let i = 0; i < completedTasks.length; i++) {
+            if (completedTasks[i].taskKey === todoKey) {
+                completedTasks.splice(i, 1);
+            };
+        };
+    } else {
+        for (let i = 0; i < tasks.length; i++) {
+            if (tasks[i].taskKey === todoKey) {
+                tasks.splice(i, 1);
+            };
         };
     };
-    loadInbox(tasks);
+
+    for (let i = 0; i < sidebar.childNodes.length; i++) {
+        if (sidebar.childNodes[i].classList.contains('sidebar-selected')) {
+            let sidebarEl = sidebar.childNodes[i].id;
+            loadPage(sidebarEl);
+        };
+    };
+
 };
 
 function showTaskModal(e) {
