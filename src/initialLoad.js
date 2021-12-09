@@ -374,7 +374,7 @@ function completeTask(e) {
             if (data.completedTasks[i].taskKey === todoKey) {
                 data.completedTasks[i].status = 'incomplete';
                 let uncompletedTask = data.completedTasks.splice(i, 1);
-                tasks.push(uncompletedTask[0]);
+                data.tasks.push(uncompletedTask[0]);
             };
         };
     };
