@@ -232,6 +232,22 @@ a {
     border-bottom: 2px solid #DDD;
 }
 
+.extra-todo {
+    display: block;
+    width: calc(100vw - 370px);
+    padding-left: 24px;
+    padding-top: 8px;
+    font-size: 16px;
+}
+
+.extra-todo.hidden {
+    display: none;
+}
+
+.notes-tag.hidden {
+    display: none;
+}
+
 .checkbox {
     cursor: pointer;
 }
@@ -509,6 +525,10 @@ a {
             "date"
             "priority"
             "buttons";
+    }
+
+    .extra-todo {
+        width: calc(100vw - 180px);
     }
 }
 

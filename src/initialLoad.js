@@ -6,6 +6,22 @@ let tasks = [{title: 'Hover over the \'Check\' icon next to ToDo', notes: '', da
 let completedTasks = [];
 let todaysTasks = [];
 let thisWeeksTasks = [];
+let usedKeys = [];
+
+let data = {tasks, completedTasks, usedKeys};
+
+function updateLocalStorage() {
+    localStorage.setItem('data', JSON.stringify(data));
+    getLocalStorage();
+};
+
+export function getLocalStorage() {
+    if (localStorage.getItem('data')) {
+        let unstringifiedData = localStorage.getItem('data');
+        data = JSON.parse(unstringifiedData)
+        return data;
+    };
+};
 
 export function loadHeader() {
 
@@ -114,7 +130,7 @@ export function loadMain() {
     const main = document.createElement('div');
     main.id = 'main';
     content.insertBefore(main, document.querySelector('footer'));
-    loadInbox(tasks);
+    loadInbox(data.tasks);
 };
 
 export function headerController() {
@@ -174,7 +190,7 @@ export function sidebarController() {
 function loadPage(e) {
     switch (e) {
         case 'inbox':
-            loadInbox(tasks);
+            loadInbox(data.tasks);
             break;
         case 'today':
             getTodaysTasks();
@@ -189,7 +205,7 @@ function loadPage(e) {
         case 'projects':
             break;
         case 'archive':
-            loadInbox(completedTasks);
+            loadInbox(data.completedTasks);
             break;
         default:
             alert('Something went wrong')
@@ -203,10 +219,9 @@ export function addTask() {
         const taskNotes = document.querySelector('#new-task-notes-input');
         const taskDate = document.querySelector('#new-task-date-input');
         const taskPriority = document.querySelector('#new-task-priority-input');
-        let usedKeys = [];
         function randCharString() {
             let randString = Math.random().toString(36).slice(2);
-            if (usedKeys.includes(randString)) {
+            if (data.usedKeys.includes(randString)) {
                 randCharString();
             } else {
                 return randString;
@@ -222,17 +237,18 @@ export function addTask() {
         } else if (e.target.id === 'save-btn' && 
         document.querySelector('#new-task-viewport')) {
             let task = createTask(taskTitle.value, taskNotes.value, taskDate.value, taskPriority.value, status, taskKey);
-            usedKeys.push(taskKey);
+            data.usedKeys.push(taskKey);
             const modalHeader = document.querySelector('#new-task-modal-header');
             if (modalHeader) {
                 if (modalHeader.innerText.includes('Create')) {
-                    tasks.push(task);
+                    data.tasks.push(task);
                 } else if (modalHeader.innerText.includes('Edit')) {
                     let taskIndex = getTaskIndexViaTodoElement.taskIndex;
-                    tasks.splice(taskIndex, 1, task)
+                    data.tasks.splice(taskIndex, 1, task)
                 }
             }
-            loadInbox(tasks);
+            updateLocalStorage();
+            loadInbox(data.tasks);
             sidebarController.removeSidebarHighlight();
             sidebarController.addSidebarHighlight();
             document.querySelector('#new-task-viewport').remove();
@@ -297,6 +313,14 @@ function loadInbox(array) {
         let trashIcon = document.createElement('i');
         trashIcon.classList.add('fas');
         trashIcon.classList.add('fa-trash-alt');
+        let extraTodo = document.createElement('div');
+        extraTodo.classList.add('extra-todo');
+        extraTodo.classList.add('hidden');
+        let notesTag = document.createElement('span');
+        notesTag.innerHTML = '<strong>Notes:</strong><br>';
+        let notes = document.createElement('span');
+        notes.innerText = array[i].notes;
+        Todo.appendChild(extraTodo);
         Todo.appendChild(checkbox);
         Todo.appendChild(taskTitle);
         Todo.appendChild(taskDate);
@@ -304,15 +328,20 @@ function loadInbox(array) {
         Todo.appendChild(moveIcon);
         Todo.appendChild(editIcon);
         Todo.appendChild(trashIcon);
+        extraTodo.appendChild(notesTag);
+        extraTodo.appendChild(notes);
+        Todo.appendChild(extraTodo);
         inboxList.appendChild(Todo);
 
         Todo.addEventListener('click', e => {
             if (e.target.localName === 'span' || e.target.classList.contains('todo')) {
-                // expandTask(e);
+                expandTask(extraTodo);
             } else if (e.target.type === 'checkbox') {
                 completeTask(e);
             } else if (e.target.classList.contains('fa-flag')) {
                 console.log(tasks);
+                console.log(data.tasks);
+                console.log(data);
                 // promptChangePriority(e);
             } else if (e.target.classList.contains('fa-arrow-alt-circle-right')) {
                 // promptAssignToProject(e);
@@ -325,48 +354,54 @@ function loadInbox(array) {
     };
 };
 
+function expandTask(extraTodo) {
+    extraTodo.classList.toggle('hidden');
+}
+
 function completeTask(e) {
     const todoKey = e.target.parentNode.dataset.key;
     markComplete(e);
     if (e.target.checked === true) {
-        for (let i = 0; i < tasks.length; i++) {
-            if (tasks[i].taskKey === todoKey) {
-                tasks[i].status = 'complete';
-                let completedTask = tasks.splice(i, 1);
-                completedTasks.push(completedTask[0]);
+        for (let i = 0; i < data.tasks.length; i++) {
+            if (data.tasks[i].taskKey === todoKey) {
+                data.tasks[i].status = 'complete';
+                let completedTask = data.tasks.splice(i, 1);
+                data.completedTasks.push(completedTask[0]);
             };
         };
     } else if (e.target.checked === false) {
-        for (let i = 0; i < completedTasks.length; i++) {
-            if (completedTasks[i].taskKey === todoKey) {
-                completedTasks[i].status = 'incomplete';
-                let uncompletedTask = completedTasks.splice(i, 1);
+        for (let i = 0; i < data.completedTasks.length; i++) {
+            if (data.completedTasks[i].taskKey === todoKey) {
+                data.completedTasks[i].status = 'incomplete';
+                let uncompletedTask = data.completedTasks.splice(i, 1);
                 tasks.push(uncompletedTask[0]);
             };
         };
     };
+    updateLocalStorage();
 };
 
 function markComplete(e) {
     e.target.parentNode.classList.toggle('complete');
-}
+};
 
 function deleteTask(e) {
     const sidebar = document.querySelector('#sidebar');
     const todoKey = e.target.parentNode.dataset.key;
     if (e.target.parentNode.classList.contains('complete')) {
-        for (let i = 0; i < completedTasks.length; i++) {
-            if (completedTasks[i].taskKey === todoKey) {
-                completedTasks.splice(i, 1);
+        for (let i = 0; i < data.completedTasks.length; i++) {
+            if (data.completedTasks[i].taskKey === todoKey) {
+                data.completedTasks.splice(i, 1);
             };
         };
     } else {
-        for (let i = 0; i < tasks.length; i++) {
-            if (tasks[i].taskKey === todoKey) {
-                tasks.splice(i, 1);
+        for (let i = 0; i < data.tasks.length; i++) {
+            if (data.tasks[i].taskKey === todoKey) {
+                data.tasks.splice(i, 1);
             };
         };
     };
+    updateLocalStorage();
 
     for (let i = 0; i < sidebar.childNodes.length; i++) {
         if (sidebar.childNodes[i].classList.contains('sidebar-selected')) {
@@ -428,7 +463,7 @@ function showTaskModal(e) {
         if (i === 0) {
             const newTaskFormInput = document.createElement('input');
             if (taskIndex) {
-                newTaskFormInput.value = tasks[taskIndex].title;
+                newTaskFormInput.value = data.tasks[taskIndex].title;
             }
             newTaskFormInput.required = true;
             newTaskFormInput.maxLength = '40';
@@ -437,7 +472,7 @@ function showTaskModal(e) {
         } else if (i === 1) {
             const newTaskFormInput = document.createElement('input');
             if (taskIndex) {
-                newTaskFormInput.value = tasks[taskIndex].date;
+                newTaskFormInput.value = data.tasks[taskIndex].date;
             }
             newTaskFormInput.type = 'date';
             newTaskFormInput.id = formElements[i][2];
@@ -445,8 +480,9 @@ function showTaskModal(e) {
         } else if (i === 2) {
             const newTaskFormInput = document.createElement('textarea');
             if (taskIndex) {
-                newTaskFormInput.value = tasks[taskIndex].notes;
+                newTaskFormInput.value = data.tasks[taskIndex].notes;
             }
+            newTaskFormInput.maxLength = '400';
             newTaskFormInput.id = formElements[i][2];
             newTaskFormElement.appendChild(newTaskFormInput);
         } else if (i === 3) {
@@ -457,7 +493,7 @@ function showTaskModal(e) {
                 const newTaskFormOption = document.createElement('option');
                 newTaskFormOption.value = priorities[j];
                 if (taskIndex) {
-                    if (tasks[taskIndex].priority === priorities[j]) {
+                    if (data.tasks[taskIndex].priority === priorities[j]) {
                         newTaskFormOption.selected = 'selected';
                     }
                 }
@@ -488,20 +524,20 @@ function showTaskModal(e) {
 
 function getTodaysTasks() {
     todaysTasks = [];
-    for (let i = 0; i < tasks.length; i++) {
-        let date = parseISO(tasks[i].date);
+    for (let i = 0; i < data.tasks.length; i++) {
+        let date = parseISO(data.tasks[i].date);
         if (isToday(date)) {
-            todaysTasks.push(tasks[i]);
+            todaysTasks.push(data.tasks[i]);
         };
     };
 };
 
 function getThisWeeksTasks() {
     thisWeeksTasks = [];
-    for (let i = 0; i < tasks.length; i++) {
-        let date = parseISO(tasks[i].date);
+    for (let i = 0; i < data.tasks.length; i++) {
+        let date = parseISO(data.tasks[i].date);
         if (isThisWeek(date)) {
-            thisWeeksTasks.push(tasks[i]);
+            thisWeeksTasks.push(data.tasks[i]);
         };
     };
 };
@@ -509,8 +545,8 @@ function getThisWeeksTasks() {
 function getTaskIndexViaTodoElement(e) {
     let thisTaskKey = e.target.parentElement.dataset.key;
     let taskIndex;
-    for (let x in tasks) {
-        if (tasks[x].taskKey == thisTaskKey) {
+    for (let x in data.tasks) {
+        if (data.tasks[x].taskKey == thisTaskKey) {
             taskIndex = x;
         };
     };
